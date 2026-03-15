@@ -179,7 +179,7 @@ fun SettingsScreen(
                     Text(text = stringResource(R.string.style_training_settings_button))
                 }
             }
-            if (viewModel.updateCheckEnabled) {
+            if (viewModel.updateSectionVisible) {
                 SectionCard(
                     title = if (updateInfo != null) {
                         stringResource(R.string.update_available_title, updateInfo!!.versionName)
@@ -188,30 +188,37 @@ fun SettingsScreen(
                     },
                     subtitle = updateInfo?.message ?: stringResource(R.string.update_check_body),
                 ) {
-                    Button(
-                        onClick = {
-                            context.startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse(viewModel.updateSiteUrl.ifBlank { updateInfo?.pageUrl ?: updateInfo?.apkUrl.orEmpty() }),
-                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(text = stringResource(R.string.update_site_button))
-                    }
-                    Button(
-                        onClick = viewModel::refreshUpdate,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = if (checkingForUpdate) {
-                                stringResource(R.string.update_checking)
-                            } else {
-                                stringResource(R.string.update_check_button)
+                    if (viewModel.updateSiteUrl.isNotBlank() || updateInfo != null) {
+                        Button(
+                            onClick = {
+                                val websiteUrl = viewModel.updateSiteUrl.ifBlank {
+                                    updateInfo?.pageUrl ?: updateInfo?.apkUrl.orEmpty()
+                                }
+                                if (websiteUrl.isNotBlank()) {
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl))
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                                    )
+                                }
                             },
-                        )
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(text = stringResource(R.string.update_site_button))
+                        }
+                    }
+                    if (viewModel.updateCheckEnabled) {
+                        Button(
+                            onClick = viewModel::refreshUpdate,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                text = if (checkingForUpdate) {
+                                    stringResource(R.string.update_checking)
+                                } else {
+                                    stringResource(R.string.update_check_button)
+                                },
+                            )
+                        }
                     }
                     if (updateInfo != null) {
                         Button(

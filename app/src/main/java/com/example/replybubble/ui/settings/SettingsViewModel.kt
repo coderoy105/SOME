@@ -34,6 +34,7 @@ class SettingsViewModel @Inject constructor(
     val checkingForUpdate = MutableStateFlow(false)
     val updateCheckEnabled: Boolean = appUpdateChecker.isConfigured()
     val updateSiteUrl: String = BuildConfig.UPDATE_SITE_URL.trim()
+    val updateSectionVisible: Boolean = updateSiteUrl.isNotBlank() || updateCheckEnabled
 
     init {
         refreshUpdate()

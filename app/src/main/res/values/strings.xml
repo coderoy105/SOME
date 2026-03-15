@@ -34,7 +34,7 @@
     <string name="overlay_analysis_in_progress">이미 화면 분석을 진행 중이에요.</string>
     <string name="overlay_correction_in_progress">이미 입력창 교정을 진행 중이에요.</string>
     <string name="overlay_result_missing_toast">아직 열 수 있는 분석 결과가 없어요.</string>
-    <string name="overlay_accessibility_toast">접근성 설정에서 SOME을 켠 뒤 DM 화면으로 돌아와 다시 눌러 주세요.</string>
+    <string name="overlay_accessibility_toast">먼저 앱 정보 화면 오른쪽 위 메뉴에서 "제한된 설정 허용"을 켠 뒤, 접근성 설정에서 SOME을 켜 주세요.</string>
     <string name="overlay_suggestions_title">바로 복사할 답장</string>
     <string name="overlay_copy_button">이 답장 복사</string>
     <string name="overlay_status_correction_running">입력한 문장을 읽고 맞춤법과 띄어쓰기를 교정하는 중이에요.</string>
@@ -219,6 +219,10 @@
     <string name="settings_overlay_scale_value">현재 크기: %1$d%%</string>
     <string name="settings_guide_overlay_title">오버레이 사용 안내</string>
     <string name="settings_guide_overlay_body">홈에서 오버레이를 시작한 뒤, 채팅 화면에서 버블을 눌러 분석 패널을 열 수 있습니다. 보이지 않으면 배터리 최적화와 다른 앱 위 표시 권한을 다시 확인하세요.</string>
+    <string name="settings_accessibility_guide_title">접근성 권한 안내</string>
+    <string name="settings_accessibility_guide_body">웹에서 설치한 앱은 바로 접근성을 켜지 못할 수 있어요. 먼저 앱 정보 화면의 오른쪽 위 메뉴에서 "제한된 설정 허용"을 켠 다음, 접근성 설정에서 SOME 화면 분석을 켜 주세요.</string>
+    <string name="settings_accessibility_step_1">1. 앱 정보 열기</string>
+    <string name="settings_accessibility_step_2">2. 제한된 설정 허용 후 접근성 열기</string>
     <string name="settings_guide_capture_title">화면 분석 안내</string>
     <string name="settings_guide_capture_body">화면 분석은 사용자가 직접 눌렀을 때만 1회 실행됩니다. OCR 결과가 짧아도 기본 추천 카드가 남아 앱이 멈추지 않습니다.</string>
     <string name="settings_data_actions_title">저장 데이터 관리</string>

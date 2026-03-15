@@ -1,7 +1,7 @@
 {
-    "versionCode":  9,
-    "versionName":  "1.0.8",
-    "apkUrl":  "https://github.com/coderoy105/SOME/releases/download/v1.0.8/some-1.0.8.apk",
+    "versionCode":  10,
+    "versionName":  "1.0.9",
+    "apkUrl":  "https://github.com/coderoy105/SOME/releases/download/v1.0.9/some-1.0.9.apk",
     "pageUrl":  "https://coderoy105.github.io/SOME/",
     "force":  false,
     "message":  "A new SOME update is ready."

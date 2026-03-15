@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +44,7 @@ import com.example.replybubble.BuildConfig
 import com.example.replybubble.R
 import com.example.replybubble.domain.model.RelationshipType
 import com.example.replybubble.domain.model.ToneStyle
+import com.example.replybubble.overlay.AccessibilityCaptureHelper
 import com.example.replybubble.ui.common.ChoiceChipGroup
 import com.example.replybubble.ui.common.GradientScreenContainer
 import com.example.replybubble.ui.common.SectionCard
@@ -56,6 +58,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -170,6 +173,23 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(text = stringResource(R.string.style_training_settings_button))
+                }
+            }
+            SectionCard(
+                title = stringResource(R.string.settings_accessibility_guide_title),
+                subtitle = stringResource(R.string.settings_accessibility_guide_body),
+            ) {
+                Button(
+                    onClick = { AccessibilityCaptureHelper.openAppInfoSettings(context) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = stringResource(R.string.settings_accessibility_step_1))
+                }
+                Button(
+                    onClick = { AccessibilityCaptureHelper.openAccessibilitySettings(context) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = stringResource(R.string.settings_accessibility_step_2))
                 }
             }
             SectionCard(

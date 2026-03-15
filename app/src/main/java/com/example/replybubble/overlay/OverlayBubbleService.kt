@@ -392,7 +392,7 @@ class OverlayBubbleService : Service() {
             statusTextView?.text = statusText
             OverlayRuntimeState.updateStatus(statusText, null)
             hidePanel()
-            AccessibilityCaptureHelper.openAccessibilitySettings(this)
+            AccessibilityCaptureHelper.openAppInfoSettings(this)
             Toast.makeText(this, getString(R.string.overlay_accessibility_toast), Toast.LENGTH_LONG).show()
             return
         }
@@ -438,7 +438,7 @@ class OverlayBubbleService : Service() {
             statusTextView?.text = statusText
             OverlayRuntimeState.updateStatus(statusText, latestSessionId)
             hidePanel()
-            AccessibilityCaptureHelper.openAccessibilitySettings(this)
+            AccessibilityCaptureHelper.openAppInfoSettings(this)
             Toast.makeText(this, getString(R.string.overlay_accessibility_toast), Toast.LENGTH_LONG).show()
             return
         }

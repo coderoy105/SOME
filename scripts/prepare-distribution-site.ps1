@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$BaseUrl,
-    [string]$ApkSourcePath = "app/build/outputs/apk/debug/app-debug.apk"
+    [string]$ApkSourcePath = "app/build/outputs/apk/debug/app-debug.apk",
+    [switch]$SkipApkCopy
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,7 +31,7 @@ if (-not (Test-Path $versionPropertiesPath)) {
     throw "version.properties file was not found: $versionPropertiesPath"
 }
 
-if (-not (Test-Path $apkSource)) {
+if ((-not $SkipApkCopy) -and (-not (Test-Path $apkSource))) {
     throw "APK file was not found: $apkSource"
 }
 
@@ -55,7 +56,9 @@ New-Item -ItemType Directory -Path $apkDirectory -Force | Out-Null
 
 $apkFileName = "some-$versionName.apk"
 $apkTarget = Join-Path $apkDirectory $apkFileName
-Copy-Item -Path $apkSource -Destination $apkTarget -Force
+if (-not $SkipApkCopy) {
+    Copy-Item -Path $apkSource -Destination $apkTarget -Force
+}
 
 $apkUrl = "$normalizedBaseUrl" + "apk/$apkFileName"
 $pageUrl = $normalizedBaseUrl
@@ -166,8 +169,8 @@ $indexHtml = @"
 </html>
 "@
 
-Set-Content -Path (Join-Path $siteDirectory "latest.json") -Value $latestJson -Encoding utf8
-Set-Content -Path (Join-Path $siteDirectory "index.html") -Value $indexHtml -Encoding utf8
+Set-Content -Path (Join-Path $siteDirectory "latest.json") -Value $latestJson -Encoding ascii
+Set-Content -Path (Join-Path $siteDirectory "index.html") -Value $indexHtml -Encoding ascii
 
 Write-Output "Prepared distribution site"
 Write-Output "Version: $versionName ($versionCode)"

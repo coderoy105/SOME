@@ -51,3 +51,20 @@ git push origin main
 ```
 
 After push, GitHub Actions will build a signed release APK and deploy it to GitHub Pages.
+
+## Automatic version bump
+
+This repository can auto-bump `version.properties` and refresh `distribution-site` on commit.
+
+Enable it once:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-git-hooks.ps1
+```
+
+After that, whenever staged app code changes are committed, the pre-commit hook will:
+
+1. increase `VERSION_CODE`
+2. increase the patch part of `VERSION_NAME`
+3. refresh `distribution-site/index.html`
+4. refresh `distribution-site/latest.json`

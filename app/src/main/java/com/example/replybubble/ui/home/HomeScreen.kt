@@ -1,7 +1,5 @@
 package com.example.replybubble.ui.home
 
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -65,7 +63,6 @@ fun HomeScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val availableUpdate = uiState.updateInfo
     val batteryIgnored = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
     var pendingOverlayStart by rememberSaveable { mutableStateOf(false) }
 
@@ -205,58 +202,6 @@ fun HomeScreen(
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(text = stringResource(R.string.open_battery_optimization_button))
-                            }
-                        }
-                    }
-                }
-
-                if (uiState.updateCheckEnabled) {
-                    item {
-                        SectionCard(
-                            title = if (availableUpdate != null) {
-                                stringResource(R.string.update_available_title, availableUpdate.versionName)
-                            } else {
-                                stringResource(R.string.update_check_title)
-                            },
-                            subtitle = availableUpdate?.message ?: stringResource(R.string.update_check_body),
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                FilledTonalButton(
-                                    onClick = viewModel::refreshUpdate,
-                                    modifier = Modifier.weight(1f),
-                                ) {
-                                    Text(
-                                        text = if (uiState.checkingForUpdate) {
-                                            stringResource(R.string.update_checking)
-                                        } else {
-                                            stringResource(R.string.update_check_button)
-                                        },
-                                    )
-                                }
-                                if (availableUpdate != null) {
-                                    FilledTonalButton(
-                                        onClick = {
-                                            val targetUrl = availableUpdate.pageUrl ?: availableUpdate.apkUrl
-                                            context.startActivity(
-                                                Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
-                                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                                            )
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                    ) {
-                                        Text(text = stringResource(R.string.update_download_button))
-                                    }
-                                }
-                            }
-                            if (availableUpdate != null) {
-                                Text(
-                                    text = stringResource(R.string.update_manual_install_hint),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
                             }
                         }
                     }

@@ -37,6 +37,7 @@ import com.example.replybubble.MainActivity
 import com.example.replybubble.R
 import com.example.replybubble.correction.TextCorrectionEngine
 import com.example.replybubble.domain.model.ContactProfile
+import com.example.replybubble.domain.model.ReplyCategory
 import com.example.replybubble.domain.model.ReplySuggestion
 import com.example.replybubble.domain.repository.ProfileRepository
 import com.example.replybubble.domain.repository.SessionRepository
@@ -80,8 +81,10 @@ class OverlayBubbleService : Service() {
     private var statusTextView: TextView? = null
     private var profileValueTextView: TextView? = null
     private var suggestionsTitleView: TextView? = null
+    private var suggestionsToggleView: TextView? = null
     private var suggestionsScrollView: ScrollView? = null
     private var suggestionsContainer: LinearLayout? = null
+    private var suggestionsCollapsed = false
     private var latestSessionId: Long? = null
     private var availableProfiles: List<ContactProfile> = emptyList()
     private var selectedProfileId: Long? = null
@@ -328,13 +331,32 @@ class OverlayBubbleService : Service() {
         }
         val profileButton = makeActionButton(getString(R.string.overlay_profile_button), accent = true) {}
         profileButton.setOnClickListener { showProfileMenu(profileButton) }
+        val suggestionsHeader = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            visibility = View.GONE
+            setPadding(0, dp(10), 0, dp(6))
+        }
         val suggestionsTitle = TextView(this).apply {
             text = getString(R.string.overlay_suggestions_title)
             textSize = 12f
             setTextColor(ContextCompat.getColor(context, android.R.color.black))
-            visibility = View.GONE
-            setPadding(0, dp(10), 0, dp(6))
         }
+        val suggestionsToggle = TextView(this).apply {
+            text = getString(R.string.overlay_suggestions_hide)
+            textSize = 11f
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            alpha = 0.78f
+            setOnClickListener {
+                suggestionsCollapsed = !suggestionsCollapsed
+                updateSuggestionsVisibility()
+            }
+        }
+        suggestionsHeader.addView(
+            suggestionsTitle,
+            LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f),
+        )
+        suggestionsHeader.addView(suggestionsToggle)
         val suggestionList = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
         }
@@ -355,6 +377,7 @@ class OverlayBubbleService : Service() {
         statusTextView = status
         profileValueTextView = profileValue
         suggestionsTitleView = suggestionsTitle
+        suggestionsToggleView = suggestionsToggle
         suggestionsScrollView = suggestionScroll
         suggestionsContainer = suggestionList
 
@@ -375,7 +398,7 @@ class OverlayBubbleService : Service() {
             )
             hidePanel()
         })
-        panel.addView(suggestionsTitle)
+        panel.addView(suggestionsHeader)
         panel.addView(suggestionScroll)
 
         renderSuggestions(emptyList())
@@ -548,6 +571,7 @@ class OverlayBubbleService : Service() {
         statusTextView = null
         profileValueTextView = null
         suggestionsTitleView = null
+        suggestionsToggleView = null
         suggestionsScrollView = null
         suggestionsContainer = null
 
@@ -579,11 +603,54 @@ class OverlayBubbleService : Service() {
         val container = suggestionsContainer ?: return
         container.removeAllViews()
         val hasSuggestions = suggestions.isNotEmpty()
-        suggestionsTitleView?.visibility = if (hasSuggestions) View.VISIBLE else View.GONE
-        suggestionsScrollView?.visibility = if (hasSuggestions) View.VISIBLE else View.GONE
+        suggestionsTitleView?.parent?.let { parent ->
+            (parent as? View)?.visibility = if (hasSuggestions) View.VISIBLE else View.GONE
+        }
 
-        suggestions.take(3).forEach { suggestion ->
+        buildOverlaySuggestions(suggestions).forEach { suggestion ->
             container.addView(buildSuggestionView(suggestion))
+        }
+        updateSuggestionsVisibility()
+    }
+
+    private fun buildOverlaySuggestions(suggestions: List<ReplySuggestion>): List<ReplySuggestion> {
+        val preferredOrder = listOf(
+            ReplyCategory.SAFE,
+            ReplyCategory.WITTY,
+            ReplyCategory.SWEET,
+            ReplyCategory.FOLLOW_UP,
+        )
+        val byCategory = suggestions.associateBy { it.category }
+        val ordered = mutableListOf<ReplySuggestion>()
+
+        preferredOrder.forEach { category ->
+            byCategory[category]?.let(ordered::add)
+        }
+
+        suggestions.forEach { suggestion ->
+            if (ordered.none { it.id == suggestion.id } && ordered.size < 4) {
+                ordered.add(suggestion)
+            }
+        }
+        return ordered.take(4)
+    }
+
+    private fun updateSuggestionsVisibility() {
+        val hasSuggestions = suggestionsContainer?.childCount ?: 0 > 0
+        suggestionsTitleView?.parent?.let { parent ->
+            (parent as? View)?.visibility = if (hasSuggestions) View.VISIBLE else View.GONE
+        }
+        suggestionsToggleView?.text = getString(
+            if (suggestionsCollapsed) {
+                R.string.overlay_suggestions_show
+            } else {
+                R.string.overlay_suggestions_hide
+            },
+        )
+        suggestionsScrollView?.visibility = if (hasSuggestions && !suggestionsCollapsed) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 
@@ -706,11 +773,11 @@ class OverlayBubbleService : Service() {
 
     private fun overlayCategoryLabel(suggestion: ReplySuggestion): String {
         return when (suggestion.category) {
-            com.example.replybubble.domain.model.ReplyCategory.SAFE -> getString(R.string.category_safe)
-            com.example.replybubble.domain.model.ReplyCategory.WITTY -> getString(R.string.category_witty)
-            com.example.replybubble.domain.model.ReplyCategory.SWEET -> getString(R.string.category_sweet)
-            com.example.replybubble.domain.model.ReplyCategory.SHORT -> getString(R.string.category_short)
-            com.example.replybubble.domain.model.ReplyCategory.FOLLOW_UP -> getString(R.string.category_follow_up)
+            ReplyCategory.SAFE -> getString(R.string.category_safe)
+            ReplyCategory.WITTY -> getString(R.string.category_witty)
+            ReplyCategory.SWEET -> getString(R.string.category_sweet)
+            ReplyCategory.SHORT -> getString(R.string.category_short)
+            ReplyCategory.FOLLOW_UP -> getString(R.string.category_follow_up)
         }
     }
 

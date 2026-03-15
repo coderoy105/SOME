@@ -1,5 +1,7 @@
 package com.example.replybubble.ui.settings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +60,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val updateInfo by viewModel.updateInfo.collectAsStateWithLifecycle()
+    val checkingForUpdate by viewModel.checkingForUpdate.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     Scaffold(
@@ -173,6 +177,61 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(text = stringResource(R.string.style_training_settings_button))
+                }
+            }
+            if (viewModel.updateCheckEnabled) {
+                SectionCard(
+                    title = if (updateInfo != null) {
+                        stringResource(R.string.update_available_title, updateInfo!!.versionName)
+                    } else {
+                        stringResource(R.string.update_check_title)
+                    },
+                    subtitle = updateInfo?.message ?: stringResource(R.string.update_check_body),
+                ) {
+                    Button(
+                        onClick = {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(viewModel.updateSiteUrl.ifBlank { updateInfo?.pageUrl ?: updateInfo?.apkUrl.orEmpty() }),
+                                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(text = stringResource(R.string.update_site_button))
+                    }
+                    Button(
+                        onClick = viewModel::refreshUpdate,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = if (checkingForUpdate) {
+                                stringResource(R.string.update_checking)
+                            } else {
+                                stringResource(R.string.update_check_button)
+                            },
+                        )
+                    }
+                    if (updateInfo != null) {
+                        Button(
+                            onClick = {
+                                val targetUrl = updateInfo?.pageUrl ?: updateInfo?.apkUrl.orEmpty()
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(text = stringResource(R.string.update_now_button))
+                        }
+                        Text(
+                            text = stringResource(R.string.update_manual_install_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
             SectionCard(

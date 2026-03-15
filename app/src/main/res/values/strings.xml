@@ -231,4 +231,12 @@
     <string name="settings_clear_all">전체 초기화</string>
     <string name="settings_app_info_title">앱 정보</string>
     <string name="settings_app_info_body">SOME 버전 %1$s\n내장 OCR, OpenRouter AI 추천, 내장 fallback 엔진을 함께 사용합니다.</string>
+    <string name="accessibility_permission_title">접근성 권한 켜기</string>
+    <string name="accessibility_permission_card_title">현재 화면 분석을 위해 접근성이 필요해요</string>
+    <string name="accessibility_permission_card_body">웹에서 설치한 앱은 바로 접근성을 켜지 못할 수 있어요. 아래 순서대로 한 번만 허용하면 이후부터는 바로 분석할 수 있어요.</string>
+    <string name="accessibility_permission_step_1_body">1. 앱 정보 화면으로 이동한 뒤 오른쪽 위 메뉴에서 "제한된 설정 허용"을 켜 주세요.</string>
+    <string name="accessibility_permission_step_1_button">앱 정보 열기</string>
+    <string name="accessibility_permission_step_2_body">2. 그다음 접근성 설정으로 이동해서 "SOME 화면 분석"을 켜 주세요.</string>
+    <string name="accessibility_permission_step_2_button">접근성 설정 열기</string>
+    <string name="accessibility_permission_done">접근성 권한이 켜졌어요.</string>
 </resources>

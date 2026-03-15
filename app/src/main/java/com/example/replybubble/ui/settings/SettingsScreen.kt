@@ -44,7 +44,7 @@ import com.example.replybubble.BuildConfig
 import com.example.replybubble.R
 import com.example.replybubble.domain.model.RelationshipType
 import com.example.replybubble.domain.model.ToneStyle
-import com.example.replybubble.overlay.AccessibilityCaptureHelper
+import com.example.replybubble.overlay.AccessibilityPermissionActivity
 import com.example.replybubble.ui.common.ChoiceChipGroup
 import com.example.replybubble.ui.common.GradientScreenContainer
 import com.example.replybubble.ui.common.SectionCard
@@ -180,13 +180,21 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.settings_accessibility_guide_body),
             ) {
                 Button(
-                    onClick = { AccessibilityCaptureHelper.openAppInfoSettings(context) },
+                    onClick = {
+                        context.startActivity(
+                            AccessibilityPermissionActivity.createIntent(context, autoStart = false),
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(text = stringResource(R.string.settings_accessibility_step_1))
                 }
                 Button(
-                    onClick = { AccessibilityCaptureHelper.openAccessibilitySettings(context) },
+                    onClick = {
+                        context.startActivity(
+                            AccessibilityPermissionActivity.createIntent(context, autoStart = false),
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(text = stringResource(R.string.settings_accessibility_step_2))

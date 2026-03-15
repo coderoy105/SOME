@@ -1,0 +1,4 @@
+-keep class dagger.hilt.** { *; }
+-keep class com.google.mlkit.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn org.conscrypt.**

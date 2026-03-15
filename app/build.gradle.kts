@@ -1,3 +1,4 @@
+import java.io.File
 import java.util.Properties
 
 plugins {
@@ -42,9 +43,37 @@ fun readVersionName(): String {
     return versionProperties.getProperty("VERSION_NAME")?.trim().orEmpty().ifBlank { "1.0.0" }
 }
 
+fun resolveSecretFile(path: String): File? {
+    if (path.isBlank()) return null
+    val directFile = File(path)
+    return if (directFile.isAbsolute) directFile else rootProject.file(path)
+}
+
+val releaseStoreFile = resolveSecretFile(readSecret("signing.storeFile", "SIGNING_STORE_FILE"))
+val releaseStorePassword = readSecret("signing.storePassword", "SIGNING_STORE_PASSWORD")
+val releaseKeyAlias = readSecret("signing.keyAlias", "SIGNING_KEY_ALIAS")
+val releaseKeyPassword = readSecret("signing.keyPassword", "SIGNING_KEY_PASSWORD")
+val hasReleaseSigning = releaseStoreFile?.exists() == true &&
+    releaseStorePassword.isNotBlank() &&
+    releaseKeyAlias.isNotBlank() &&
+    releaseKeyPassword.isNotBlank()
+
 android {
     namespace = "com.example.replybubble"
     compileSdk = 35
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = releaseStoreFile
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.replybubble"
@@ -96,6 +125,9 @@ android {
         }
         release {
             isMinifyEnabled = true
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

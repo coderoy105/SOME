@@ -3,6 +3,9 @@
 build/
 app/build/
 distribution-site/apk/
+keystore/
+*.jks
+*.keystore
 local.properties
 *.iml
 tmp_*.txt

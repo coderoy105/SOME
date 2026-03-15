@@ -50,7 +50,12 @@ git commit -m "Release SOME 1.0.3"
 git push origin main
 ```
 
-After push, GitHub Actions will build a signed release APK and deploy it to GitHub Pages.
+After push, GitHub Actions will:
+
+1. build a signed release APK
+2. upload it to a GitHub Release
+3. refresh GitHub Pages
+4. update `latest.json` so the app can discover the new version
 
 ## Automatic version bump
 

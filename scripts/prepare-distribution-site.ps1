@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$BaseUrl,
     [string]$ApkSourcePath = "app/build/outputs/apk/debug/app-debug.apk",
+    [string]$DownloadUrl = "",
     [switch]$SkipApkCopy
 )
 
@@ -60,7 +61,11 @@ if (-not $SkipApkCopy) {
     Copy-Item -Path $apkSource -Destination $apkTarget -Force
 }
 
-$apkUrl = "$normalizedBaseUrl" + "apk/$apkFileName"
+$apkUrl = if ([string]::IsNullOrWhiteSpace($DownloadUrl)) {
+    "$normalizedBaseUrl" + "apk/$apkFileName"
+} else {
+    $DownloadUrl.Trim()
+}
 $pageUrl = $normalizedBaseUrl
 
 $latestJson = [ordered]@{
@@ -161,7 +166,7 @@ $indexHtml = @"
 
     <section class="row">
       <div class="meta">Latest version: $versionName</div>
-      <a class="button" href="./apk/$apkFileName">Download latest APK</a>
+      <a class="button" href="$apkUrl">Download latest APK</a>
       <p class="hint">This page and its version metadata are refreshed automatically by the deployment workflow.</p>
     </section>
   </main>

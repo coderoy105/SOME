@@ -6,7 +6,7 @@ on:
     branches: ["main"]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -65,12 +65,38 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: ./gradlew assembleRelease --console=plain
 
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          echo "version_code=$(grep VERSION_CODE version.properties | cut -d'=' -f2)" >> "$GITHUB_OUTPUT"
+          echo "version_name=$(grep VERSION_NAME version.properties | cut -d'=' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="v${{ steps.version.outputs.version_name }}"
+          TITLE="SOME ${{ steps.version.outputs.version_name }}"
+          ASSET_PATH="app/build/outputs/apk/release/app-release.apk"
+          ASSET_NAME="some-${{ steps.version.outputs.version_name }}.apk"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Uploading fresh APK asset."
+          else
+            gh release create "$TAG" --title "$TITLE" --notes "Automated SOME release for version ${{ steps.version.outputs.version_name }}."
+          fi
+
+          gh release upload "$TAG" "$ASSET_PATH#$ASSET_NAME" --clobber
+
       - name: Prepare site
         shell: pwsh
         run: |
           ./scripts/prepare-distribution-site.ps1 `
             -BaseUrl "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" `
-            -ApkSourcePath "app/build/outputs/apk/release/app-release.apk"
+            -DownloadUrl "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version_name }}/some-${{ steps.version.outputs.version_name }}.apk" `
+            -SkipApkCopy
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

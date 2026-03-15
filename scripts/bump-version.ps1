@@ -56,6 +56,43 @@ function Resolve-SiteUrl {
     return $siteUrl.Replace("\:", ":").Replace("\\", "\")
 }
 
+function Resolve-ReleaseDownloadUrl {
+    param(
+        [string]$ProjectRoot,
+        [string]$VersionName
+    )
+
+    try {
+        Push-Location $ProjectRoot
+        $remoteUrl = (git remote get-url origin).Trim()
+    }
+    catch {
+        return ""
+    }
+    finally {
+        Pop-Location
+    }
+
+    if ([string]::IsNullOrWhiteSpace($remoteUrl)) {
+        return ""
+    }
+
+    $normalizedRemoteUrl = $remoteUrl
+    if ($normalizedRemoteUrl -match '^git@github\.com:(.+?)/(.+?)(\.git)?$') {
+        $owner = $matches[1]
+        $repo = $matches[2]
+        return "https://github.com/$owner/$repo/releases/download/v$VersionName/some-$VersionName.apk"
+    }
+
+    if ($normalizedRemoteUrl -match '^https://github\.com/(.+?)/(.+?)(\.git)?$') {
+        $owner = $matches[1]
+        $repo = $matches[2]
+        return "https://github.com/$owner/$repo/releases/download/v$VersionName/some-$VersionName.apk"
+    }
+
+    return ""
+}
+
 function Get-NextVersionName {
     param([string]$CurrentVersionName)
 
@@ -100,6 +137,13 @@ $versionProperties["VERSION_NAME"] = $nextVersionName
 Write-PropertiesFile -Path $versionPropertiesPath -Properties $versionProperties
 
 $resolvedBaseUrl = Resolve-SiteUrl -ProjectRoot $projectRoot -CliBaseUrl $BaseUrl
-powershell -ExecutionPolicy Bypass -File $prepareScriptPath -BaseUrl $resolvedBaseUrl -SkipApkCopy
+$downloadUrl = Resolve-ReleaseDownloadUrl -ProjectRoot $projectRoot -VersionName $nextVersionName
+
+if ([string]::IsNullOrWhiteSpace($downloadUrl)) {
+    powershell -ExecutionPolicy Bypass -File $prepareScriptPath -BaseUrl $resolvedBaseUrl -SkipApkCopy
+}
+else {
+    powershell -ExecutionPolicy Bypass -File $prepareScriptPath -BaseUrl $resolvedBaseUrl -DownloadUrl $downloadUrl -SkipApkCopy
+}
 
 Write-Output "Bumped version to $nextVersionName ($nextVersionCode)"

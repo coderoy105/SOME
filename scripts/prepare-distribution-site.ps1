@@ -68,22 +68,24 @@ $apkUrl = if ([string]::IsNullOrWhiteSpace($DownloadUrl)) {
 }
 $pageUrl = $normalizedBaseUrl
 
-$latestJson = [ordered]@{
-    versionCode = $versionCode
-    versionName = $versionName
-    apkUrl = $apkUrl
-    pageUrl = $pageUrl
-    force = $false
-    message = "A new SOME update is ready."
-} | ConvertTo-Json -Depth 4
+$latestJson = @"
+{
+  "versionCode": $versionCode,
+  "versionName": "$versionName",
+  "apkUrl": "$apkUrl",
+  "pageUrl": "$pageUrl",
+  "force": false,
+  "message": "\uC0C8 \uBC84\uC804\uC774 \uC900\uBE44\uB410\uC5B4\uC694."
+}
+"@
 
 $indexHtml = @"
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SOME Download</title>
+  <title>SOME</title>
   <style>
     :root {
       --pink: #f05d9b;
@@ -162,20 +164,28 @@ $indexHtml = @"
 <body>
   <main class="card">
     <h1>SOME</h1>
-    <p>This page hosts the latest SOME APK. On Android, you may need to allow installs from unknown apps before opening the file.</p>
+    <p id="description"></p>
 
     <section class="row">
-      <div class="meta">Latest version: $versionName</div>
-      <a class="button" href="$apkUrl">Download latest APK</a>
-      <p class="hint">This page and its version metadata are refreshed automatically by the deployment workflow.</p>
+      <div class="meta" id="versionLabel"></div>
+      <a class="button" href="$apkUrl" id="downloadButton"></a>
+      <p class="hint" id="hint"></p>
     </section>
   </main>
+  <script>
+    document.title = 'SOME \uB2E4\uC6B4\uB85C\uB4DC';
+    document.getElementById('description').textContent = '\uCD5C\uC2E0 SOME APK \uB2E4\uC6B4\uB85C\uB4DC \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4. \uC124\uCE58 \uC804 "\uC54C \uC218 \uC5C6\uB294 \uC571 \uC124\uCE58" \uD5C8\uC6A9\uC774 \uD544\uC694\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.';
+    document.getElementById('versionLabel').textContent = '\uCD5C\uC2E0 \uBC84\uC804: $versionName';
+    document.getElementById('downloadButton').textContent = '\uCD5C\uC2E0 APK \uB2E4\uC6B4\uB85C\uB4DC';
+    document.getElementById('hint').textContent = '\uC774 \uD398\uC774\uC9C0\uC640 \uBC84\uC804 \uC815\uBCF4\uB294 \uCF54\uB4DC\uAC00 \uBC30\uD3EC\uB420 \uB54C \uC790\uB3D9\uC73C\uB85C \uAC31\uC2E0\uB3FC\uC694.';
+  </script>
 </body>
 </html>
 "@
 
-Set-Content -Path (Join-Path $siteDirectory "latest.json") -Value $latestJson -Encoding ascii
-Set-Content -Path (Join-Path $siteDirectory "index.html") -Value $indexHtml -Encoding ascii
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText((Join-Path $siteDirectory "latest.json"), $latestJson, $utf8NoBom)
+[System.IO.File]::WriteAllText((Join-Path $siteDirectory "index.html"), $indexHtml, $utf8NoBom)
 
 Write-Output "Prepared distribution site"
 Write-Output "Version: $versionName ($versionCode)"

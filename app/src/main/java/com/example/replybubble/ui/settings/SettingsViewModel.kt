@@ -11,6 +11,7 @@ import com.example.replybubble.domain.repository.SessionRepository
 import com.example.replybubble.domain.repository.SettingsRepository
 import com.example.replybubble.update.AppUpdateChecker
 import com.example.replybubble.update.AppUpdateInfo
+import com.example.replybubble.update.UpdateCheckResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,7 @@ class SettingsViewModel @Inject constructor(
     )
     val updateInfo = MutableStateFlow<AppUpdateInfo?>(null)
     val checkingForUpdate = MutableStateFlow(false)
+    val updateStatus = MutableStateFlow<UpdateCheckResult>(UpdateCheckResult.NotConfigured)
     val updateCheckEnabled: Boolean = appUpdateChecker.isConfigured()
     val updateSiteUrl: String = BuildConfig.UPDATE_SITE_URL.trim()
     val updateSectionVisible: Boolean = updateSiteUrl.isNotBlank() || updateCheckEnabled
@@ -89,10 +91,34 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refreshUpdate() {
-        if (!appUpdateChecker.isConfigured()) return
+        if (!appUpdateChecker.isConfigured()) {
+            updateInfo.value = null
+            updateStatus.value = UpdateCheckResult.NotConfigured
+            return
+        }
         viewModelScope.launch {
             checkingForUpdate.value = true
-            updateInfo.value = appUpdateChecker.checkForUpdate()
+            when (val result = appUpdateChecker.checkForUpdate()) {
+                is UpdateCheckResult.UpdateAvailable -> {
+                    updateInfo.value = result.info
+                    updateStatus.value = result
+                }
+
+                is UpdateCheckResult.UpToDate -> {
+                    updateInfo.value = null
+                    updateStatus.value = result
+                }
+
+                is UpdateCheckResult.Failed -> {
+                    updateInfo.value = null
+                    updateStatus.value = result
+                }
+
+                UpdateCheckResult.NotConfigured -> {
+                    updateInfo.value = null
+                    updateStatus.value = UpdateCheckResult.NotConfigured
+                }
+            }
             checkingForUpdate.value = false
         }
     }

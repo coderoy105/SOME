@@ -16,9 +16,9 @@ class AppUpdateChecker @Inject constructor(
 ) {
     fun isConfigured(): Boolean = BuildConfig.UPDATE_FEED_URL.isNotBlank()
 
-    suspend fun checkForUpdate(): AppUpdateInfo? {
+    suspend fun checkForUpdate(): UpdateCheckResult {
         val feedUrl = BuildConfig.UPDATE_FEED_URL.trim()
-        if (feedUrl.isBlank()) return null
+        if (feedUrl.isBlank()) return UpdateCheckResult.NotConfigured
 
         return withContext(Dispatchers.IO) {
             runCatching {
@@ -30,18 +30,21 @@ class AppUpdateChecker @Inject constructor(
                 okHttpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) {
                         Log.w(TAG, "Update feed request failed: ${response.code}")
-                        return@use null
+                        return@use UpdateCheckResult.Failed("HTTP ${response.code}")
                     }
                     parse(response.body?.string().orEmpty())
                 }
             }.onFailure { throwable ->
                 Log.e(TAG, "Update feed request error", throwable)
-            }.getOrNull()
+            }.getOrElse { throwable ->
+                UpdateCheckResult.Failed(throwable.message)
+            }
         }
     }
 
-    private fun parse(raw: String): AppUpdateInfo? {
-        if (raw.isBlank()) return null
+    private fun parse(raw: String): UpdateCheckResult {
+        if (raw.isBlank()) return UpdateCheckResult.Failed("Empty feed")
+
         val root = JSONObject(raw)
         val versionCode = root.optInt("versionCode", 0)
         val versionName = root.optString("versionName").trim()
@@ -52,16 +55,18 @@ class AppUpdateChecker @Inject constructor(
         val message = root.optString("message").trim()
         val force = root.optBoolean("force", false)
 
-        if (versionCode <= BuildConfig.VERSION_CODE) return null
-        if (apkUrl.isBlank()) return null
+        if (versionCode <= BuildConfig.VERSION_CODE) return UpdateCheckResult.UpToDate
+        if (apkUrl.isBlank()) return UpdateCheckResult.Failed("Missing APK URL")
 
-        return AppUpdateInfo(
-            versionCode = versionCode,
-            versionName = versionName.ifBlank { versionCode.toString() },
-            apkUrl = apkUrl,
-            pageUrl = pageUrl,
-            message = message.ifBlank { "새 버전이 준비됐어요." },
-            force = force,
+        return UpdateCheckResult.UpdateAvailable(
+            AppUpdateInfo(
+                versionCode = versionCode,
+                versionName = versionName.ifBlank { versionCode.toString() },
+                apkUrl = apkUrl,
+                pageUrl = pageUrl,
+                message = message.ifBlank { "새 버전이 준비됐어요." },
+                force = force,
+            ),
         )
     }
 

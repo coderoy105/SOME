@@ -47,6 +47,7 @@ import com.example.replybubble.R
 import com.example.replybubble.domain.model.RelationshipType
 import com.example.replybubble.domain.model.ToneStyle
 import com.example.replybubble.overlay.AccessibilityPermissionActivity
+import com.example.replybubble.update.UpdateCheckResult
 import com.example.replybubble.ui.common.ChoiceChipGroup
 import com.example.replybubble.ui.common.GradientScreenContainer
 import com.example.replybubble.ui.common.SectionCard
@@ -62,6 +63,7 @@ fun SettingsScreen(
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val updateInfo by viewModel.updateInfo.collectAsStateWithLifecycle()
     val checkingForUpdate by viewModel.checkingForUpdate.collectAsStateWithLifecycle()
+    val updateStatus by viewModel.updateStatus.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     Scaffold(
@@ -183,10 +185,20 @@ fun SettingsScreen(
                 SectionCard(
                     title = if (updateInfo != null) {
                         stringResource(R.string.update_available_title, updateInfo!!.versionName)
+                    } else if (updateStatus is UpdateCheckResult.UpToDate) {
+                        stringResource(R.string.update_up_to_date_title)
+                    } else if (updateStatus is UpdateCheckResult.Failed) {
+                        stringResource(R.string.update_failed_title)
                     } else {
                         stringResource(R.string.update_check_title)
                     },
-                    subtitle = updateInfo?.message ?: stringResource(R.string.update_check_body),
+                    subtitle = when (updateStatus) {
+                        is UpdateCheckResult.UpdateAvailable -> updateInfo?.message
+                            ?: stringResource(R.string.update_available_body)
+                        is UpdateCheckResult.UpToDate -> stringResource(R.string.update_up_to_date_body)
+                        is UpdateCheckResult.Failed -> stringResource(R.string.update_failed_body)
+                        else -> stringResource(R.string.update_check_body)
+                    },
                 ) {
                     if (viewModel.updateSiteUrl.isNotBlank() || updateInfo != null) {
                         Button(

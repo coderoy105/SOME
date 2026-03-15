@@ -241,6 +241,11 @@
     <string name="accessibility_permission_done">접근성 권한이 켜졌어요.</string>
     <string name="update_site_button">내 웹사이트</string>
     <string name="update_now_button">업데이트 하기</string>
+    <string name="update_up_to_date_title">최신 버전 사용 중</string>
+    <string name="update_up_to_date_body">지금 설치된 SOME이 이미 최신 버전이에요.</string>
+    <string name="update_failed_title">업데이트 확인 실패</string>
+    <string name="update_failed_body">업데이트 정보를 불러오지 못했어요. 잠시 뒤 다시 확인해 주세요.</string>
+    <string name="update_available_body">새 버전이 준비됐어요. 웹사이트나 업데이트 버튼으로 설치할 수 있어요.</string>
     <string name="overlay_suggestions_hide">답장 접기</string>
     <string name="overlay_suggestions_show">답장 보기</string>
 </resources>

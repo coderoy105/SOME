@@ -16,19 +16,7 @@ object BatteryOptimizationHelper {
     }
 
     fun requestIgnoreBatteryOptimizations(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
-        val intent = Intent(
-            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-            Uri.parse("package:${context.packageName}"),
-        )
-        if (context !is Activity) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        runCatching {
-            context.startActivity(intent)
-        }.onFailure {
-            openBatteryOptimizationSettings(context)
-        }
+        openBatteryOptimizationSettings(context)
     }
 
     fun openBatteryOptimizationSettings(context: Context) {

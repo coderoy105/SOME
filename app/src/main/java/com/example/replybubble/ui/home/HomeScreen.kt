@@ -45,7 +45,6 @@ import com.example.replybubble.R
 import com.example.replybubble.overlay.BatteryOptimizationHelper
 import com.example.replybubble.overlay.OverlayBubbleService
 import com.example.replybubble.overlay.OverlayPermissionHelper
-import com.example.replybubble.update.AppUpdateInstaller
 import com.example.replybubble.ui.common.EmptyStateCard
 import com.example.replybubble.ui.common.GradientScreenContainer
 import com.example.replybubble.ui.common.ProfileCard
@@ -240,30 +239,11 @@ fun HomeScreen(
                                 if (availableUpdate != null) {
                                     FilledTonalButton(
                                         onClick = {
-                                            if (!AppUpdateInstaller.canRequestPackageInstalls(context)) {
-                                                AppUpdateInstaller.openUnknownSourcesSettings(context)
-                                                Toast.makeText(
-                                                    context,
-                                                    context.getString(R.string.update_install_permission_body),
-                                                    Toast.LENGTH_LONG,
-                                                ).show()
-                                                return@FilledTonalButton
-                                            }
-
-                                            val started = AppUpdateInstaller.startDownload(context, availableUpdate)
-                                            if (started != null) {
-                                                Toast.makeText(
-                                                    context,
-                                                    context.getString(R.string.update_download_started),
-                                                    Toast.LENGTH_SHORT,
-                                                ).show()
-                                            } else {
-                                                val targetUrl = availableUpdate.pageUrl ?: availableUpdate.apkUrl
-                                                context.startActivity(
-                                                    Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
-                                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                                                )
-                                            }
+                                            val targetUrl = availableUpdate.pageUrl ?: availableUpdate.apkUrl
+                                            context.startActivity(
+                                                Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
+                                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                                            )
                                         },
                                         modifier = Modifier.weight(1f),
                                     ) {

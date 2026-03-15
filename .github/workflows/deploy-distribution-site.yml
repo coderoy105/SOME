@@ -79,8 +79,10 @@ jobs:
         run: |
           TAG="v${{ steps.version.outputs.version_name }}"
           TITLE="SOME ${{ steps.version.outputs.version_name }}"
-          ASSET_PATH="app/build/outputs/apk/release/app-release.apk"
+          mkdir -p release-artifacts
           ASSET_NAME="some-${{ steps.version.outputs.version_name }}.apk"
+          ASSET_PATH="release-artifacts/$ASSET_NAME"
+          cp app/build/outputs/apk/release/app-release.apk "$ASSET_PATH"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists. Uploading fresh APK asset."
@@ -88,7 +90,7 @@ jobs:
             gh release create "$TAG" --title "$TITLE" --notes "Automated SOME release for version ${{ steps.version.outputs.version_name }}."
           fi
 
-          gh release upload "$TAG" "$ASSET_PATH#$ASSET_NAME" --clobber
+          gh release upload "$TAG" "$ASSET_PATH" --clobber
 
       - name: Prepare site
         shell: pwsh

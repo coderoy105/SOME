@@ -50,6 +50,15 @@ fun ReplyCategory.labelRes(): Int = when (this) {
 }
 
 @StringRes
+fun ReplyCategory.guideRes(): Int = when (this) {
+    ReplyCategory.SAFE -> R.string.category_guide_safe
+    ReplyCategory.WITTY -> R.string.category_guide_witty
+    ReplyCategory.SWEET -> R.string.category_guide_sweet
+    ReplyCategory.SHORT -> R.string.category_guide_short
+    ReplyCategory.FOLLOW_UP -> R.string.category_guide_follow_up
+}
+
+@StringRes
 fun StyleAdjustment.labelRes(): Int = when (this) {
     StyleAdjustment.MORE_CUTE -> R.string.adjustment_more_cute
     StyleAdjustment.SHORTER -> R.string.adjustment_shorter

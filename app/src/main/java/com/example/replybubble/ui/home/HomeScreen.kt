@@ -40,9 +40,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.replybubble.R
+import com.example.replybubble.overlay.AccessibilityCaptureHelper
+import com.example.replybubble.overlay.AccessibilityPermissionActivity
 import com.example.replybubble.overlay.BatteryOptimizationHelper
 import com.example.replybubble.overlay.OverlayBubbleService
 import com.example.replybubble.overlay.OverlayPermissionHelper
+import com.example.replybubble.ui.common.BottomGuideNotice
 import com.example.replybubble.ui.common.EmptyStateCard
 import com.example.replybubble.ui.common.GradientScreenContainer
 import com.example.replybubble.ui.common.ProfileCard
@@ -64,7 +67,34 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val batteryIgnored = BatteryOptimizationHelper.isIgnoringBatteryOptimizations(context)
+    val overlayPermissionGranted = OverlayPermissionHelper.canDrawOverlays(context)
+    val accessibilityEnabled = AccessibilityCaptureHelper.isServiceEnabled(context)
     var pendingOverlayStart by rememberSaveable { mutableStateOf(false) }
+
+    val overlayReadyStatus = stringResource(R.string.overlay_status_ready)
+    val overlayStoppedStatus = stringResource(R.string.overlay_status_stopped)
+    val guideMessage = when {
+        uiState.overlayState.lastStatus.isNotBlank() &&
+            uiState.overlayState.lastStatus != overlayReadyStatus &&
+            uiState.overlayState.lastStatus != overlayStoppedStatus -> uiState.overlayState.lastStatus
+        !overlayPermissionGranted -> stringResource(R.string.overlay_permission_toast)
+        !batteryIgnored -> stringResource(R.string.battery_optimization_toast)
+        !accessibilityEnabled -> stringResource(R.string.overlay_accessibility_toast)
+        uiState.overlayState.isRunning -> stringResource(R.string.guide_overlay_running)
+        else -> stringResource(R.string.guide_overlay_start)
+    }
+    val guideActionLabel: String? = when {
+        !overlayPermissionGranted -> stringResource(R.string.overlay_permission_button)
+        !batteryIgnored -> stringResource(R.string.open_battery_optimization_button)
+        !accessibilityEnabled -> stringResource(R.string.accessibility_permission_step_2_button)
+        else -> null
+    }
+    val guideAction: (() -> Unit)? = when {
+        !overlayPermissionGranted -> { { OverlayPermissionHelper.openOverlayPermissionSettings(context) } }
+        !batteryIgnored -> { { BatteryOptimizationHelper.requestIgnoreBatteryOptimizations(context) } }
+        !accessibilityEnabled -> { { context.startActivity(AccessibilityPermissionActivity.createIntent(context, autoStart = false)) } }
+        else -> null
+    }
 
     DisposableEffect(lifecycleOwner, context, pendingOverlayStart, uiState.overlayState.isRunning) {
         val observer = LifecycleEventObserver { _, event ->
@@ -102,6 +132,13 @@ fun HomeScreen(
                 onClick = onAddProfile,
                 icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
                 text = { Text(text = stringResource(R.string.home_add_profile)) },
+            )
+        },
+        bottomBar = {
+            BottomGuideNotice(
+                message = guideMessage,
+                actionLabel = guideActionLabel,
+                onAction = guideAction,
             )
         },
     ) { innerPadding ->

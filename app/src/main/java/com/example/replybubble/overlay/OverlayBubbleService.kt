@@ -676,6 +676,13 @@ class OverlayBubbleService : Service() {
             setTextColor(ContextCompat.getColor(context, android.R.color.black))
             setPadding(0, dp(4), 0, dp(5))
         }
+        val helper = TextView(this).apply {
+            text = overlayCategoryGuide(suggestion.category)
+            textSize = 11f
+            setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+            setPadding(0, 0, 0, dp(6))
+            visibility = if (text.isNullOrBlank()) View.GONE else View.VISIBLE
+        }
         val actionRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
         }
@@ -713,6 +720,7 @@ class OverlayBubbleService : Service() {
 
         card.addView(category)
         card.addView(content)
+        card.addView(helper)
         card.addView(actionRow)
 
         val params = LinearLayout.LayoutParams(
@@ -778,6 +786,16 @@ class OverlayBubbleService : Service() {
             ReplyCategory.SWEET -> getString(R.string.category_sweet)
             ReplyCategory.SHORT -> getString(R.string.category_short)
             ReplyCategory.FOLLOW_UP -> getString(R.string.category_follow_up)
+        }
+    }
+
+    private fun overlayCategoryGuide(category: ReplyCategory): String {
+        return when (category) {
+            ReplyCategory.SAFE -> getString(R.string.category_guide_safe)
+            ReplyCategory.WITTY -> getString(R.string.category_guide_witty)
+            ReplyCategory.SWEET -> getString(R.string.category_guide_sweet)
+            ReplyCategory.SHORT -> getString(R.string.category_guide_short)
+            ReplyCategory.FOLLOW_UP -> getString(R.string.category_guide_follow_up)
         }
     }
 

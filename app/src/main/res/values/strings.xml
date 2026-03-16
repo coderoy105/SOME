@@ -248,4 +248,12 @@
     <string name="update_available_body">새 버전이 준비됐어요. 웹사이트나 업데이트 버튼으로 설치할 수 있어요.</string>
     <string name="overlay_suggestions_hide">답장 접기</string>
     <string name="overlay_suggestions_show">답장 보기</string>
+    <string name="category_guide_safe">부담 없이 바로 보내기 좋은 기본 답장이에요.</string>
+    <string name="category_guide_witty">가볍게 분위기를 살리면서도 대화 흐름은 유지해요.</string>
+    <string name="category_guide_sweet">다정함이나 설렘을 조금 더 얹은 답장이에요.</string>
+    <string name="category_guide_short">짧게 답하고 싶을 때 바로 붙여넣기 좋게 만들었어요.</string>
+    <string name="category_guide_follow_up">짧게 반응한 뒤 상대가 답하기 쉬운 질문으로 대화를 이어가요.</string>
+    <string name="guide_notice_title">지금 이렇게 하면 돼요</string>
+    <string name="guide_overlay_start">오버레이 시작을 누르면 채팅 앱 위에 SOME 버블이 떠요.</string>
+    <string name="guide_overlay_running">채팅 화면으로 가서 버블을 누르세요. 채팅이 바뀌면 현재 화면 분석을 다시 눌러 최신 답장을 만들 수 있어요.</string>
 </resources>

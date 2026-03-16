@@ -36,6 +36,7 @@ import com.example.replybubble.ui.common.GradientScreenContainer
 import com.example.replybubble.ui.common.ReplySuggestionCard
 import com.example.replybubble.ui.common.SectionCard
 import com.example.replybubble.ui.common.ToggleChipGroup
+import com.example.replybubble.ui.common.guideRes
 import com.example.replybubble.ui.common.labelRes
 import com.example.replybubble.util.DateTimeFormatter
 
@@ -135,6 +136,7 @@ fun RecommendationScreen(
                         ReplySuggestionCard(
                             category = context.getString(suggestion.category.labelRes()),
                             suggestion = suggestion,
+                            helperText = context.getString(suggestion.category.guideRes()),
                             isRefreshing = suggestion.id in uiState.refreshingReplyIds,
                             onCopy = {
                                 clipboardManager.setText(AnnotatedString(suggestion.content))

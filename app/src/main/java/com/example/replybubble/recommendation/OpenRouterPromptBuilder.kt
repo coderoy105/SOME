@@ -39,7 +39,8 @@ object OpenRouterPromptBuilder {
             - WITTY should be playful but still on-topic.
             - SWEET should be warm or lightly romantic only if allowed.
             - SHORT should be concise.
-            - FOLLOW_UP should continue the conversation with a relevant question or prompt.
+            - FOLLOW_UP should briefly react to the latest message first, then ask one easy-to-answer follow-up question.
+            - FOLLOW_UP must not be a bare standalone question with no reaction.
             - No markdown, no explanations, no numbering, no backticks.
             - Keep each reply to one or two short sentences.
         """.trimIndent()

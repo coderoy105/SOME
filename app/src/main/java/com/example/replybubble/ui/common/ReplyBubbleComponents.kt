@@ -316,6 +316,7 @@ fun ReplySuggestionCard(
     category: String,
     suggestion: ReplySuggestion,
     modifier: Modifier = Modifier,
+    helperText: String? = null,
     isRefreshing: Boolean = false,
     onCopy: () -> Unit,
     onRefresh: (() -> Unit)? = null,
@@ -374,6 +375,13 @@ fun ReplySuggestionCard(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.heightIn(min = 48.dp),
             )
+            if (!helperText.isNullOrBlank()) {
+                Text(
+                    text = helperText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             if (isRefreshing) {
                 Text(
                     text = stringResource(R.string.recommendation_refreshing_single),
@@ -387,6 +395,48 @@ fun ReplySuggestionCard(
             ) {
                 Icon(imageVector = Icons.Outlined.ContentCopy, contentDescription = null)
                 Text(text = stringResource(R.string.common_copy))
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomGuideNotice(
+    message: String,
+    modifier: Modifier = Modifier,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f),
+        tonalElevation = 6.dp,
+        shadowElevation = 8.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.guide_notice_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (!actionLabel.isNullOrBlank() && onAction != null) {
+                TextButton(onClick = onAction) {
+                    Text(text = actionLabel)
+                }
             }
         }
     }

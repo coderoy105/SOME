@@ -36,9 +36,10 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           missing=0
-          for name in SIGNING_KEYSTORE_BASE64 SIGNING_STORE_PASSWORD SIGNING_KEY_ALIAS SIGNING_KEY_PASSWORD; do
+          for name in SIGNING_KEYSTORE_BASE64 SIGNING_STORE_PASSWORD SIGNING_KEY_ALIAS SIGNING_KEY_PASSWORD OPENROUTER_API_KEY; do
             if [ -z "${!name}" ]; then
               echo "Missing $name GitHub secret." >&2
               missing=1
@@ -63,9 +64,34 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: openrouter/auto
+          OPENROUTER_REFERER: https://replybubble.local
+          OPENROUTER_TITLE: SOME
           UPDATE_FEED_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/latest.json
           UPDATE_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-        run: ./gradlew assembleRelease --console=plain
+        run: ./gradlew clean assembleRelease --no-build-cache --console=plain
+
+      - name: Verify OpenRouter key is embedded in APK
+        shell: bash
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          import sys
+          import zipfile
+
+          apk_path = "app/build/outputs/apk/release/app-release.apk"
+          key = os.environ["OPENROUTER_API_KEY"].encode("utf-8")
+
+          with zipfile.ZipFile(apk_path) as apk_file:
+              classes_dex = apk_file.read("classes.dex")
+
+          if key not in classes_dex:
+              print("The release APK was built without the OpenRouter API key.", file=sys.stderr)
+              sys.exit(1)
+          PY
 
       - name: Read version
         id: version

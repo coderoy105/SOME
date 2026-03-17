@@ -52,9 +52,9 @@
     <string name="overlay_permission_button">오버레이 권한 열기</string>
     <string name="overlay_permission_granted">오버레이 권한이 이미 켜져 있어요</string>
     <string name="overlay_permission_toast">권한 화면에서 "다른 앱 위에 표시"를 허용하면 앱으로 돌아왔을 때 오버레이를 다시 시도해요.</string>
-    <string name="battery_optimization_toast">배터리 사용 제한 예외를 허용하면 앱으로 돌아왔을 때 오버레이를 다시 시도해요.</string>
-    <string name="battery_app_info_toast">앱 정보 화면에서 배터리 메뉴를 열어 "제한 없음" 또는 "제한 안 함"으로 바꿔 주세요.</string>
-    <string name="open_battery_optimization_button">배터리 예외 설정 열기</string>
+    <string name="battery_optimization_toast">일부 기기에서는 배터리 예외 목록에 SOME이 바로 안 보일 수 있어요. 앱 배터리 화면에서 "제한 없음" 또는 "제한 안 함"으로 바꿔 주세요.</string>
+    <string name="battery_app_info_toast">앱 정보 &gt; 배터리에서 "제한 없음" 또는 "제한 안 함"으로 바꿔 주세요.</string>
+    <string name="open_battery_optimization_button">앱 배터리 설정 열기</string>
 
     <string name="onboarding_title">DM 답장 추천을 버블 하나로</string>
     <string name="onboarding_subtitle">채팅 화면 위의 작은 버블에서 1회 분석을 시작하고, 최근 대화 흐름에 맞는 자연스러운 답장을 바로 복사하세요.</string>
@@ -218,7 +218,7 @@
     <string name="settings_overlay_scale_body">아래 미리보기와 슬라이더로 오버레이 패널 크기를 조절할 수 있어요. 오버레이가 켜져 있으면 바로 반영됩니다.</string>
     <string name="settings_overlay_scale_value">현재 크기: %1$d%%</string>
     <string name="settings_guide_overlay_title">오버레이 사용 안내</string>
-    <string name="settings_guide_overlay_body">홈에서 오버레이를 시작한 뒤, 채팅 화면에서 버블을 눌러 분석 패널을 열 수 있습니다. 보이지 않으면 배터리 최적화와 다른 앱 위 표시 권한을 다시 확인하세요.</string>
+    <string name="settings_guide_overlay_body">홈에서 오버레이를 시작한 뒤, 채팅 화면에서 버블을 눌러 분석 패널을 열 수 있습니다. 보이지 않으면 앱 정보 &gt; 배터리에서 "제한 없음"인지 확인하고, 다른 앱 위 표시 권한도 다시 확인해 주세요.</string>
     <string name="settings_accessibility_guide_title">접근성 권한 안내</string>
     <string name="settings_accessibility_guide_body">웹에서 설치한 앱은 바로 접근성을 켜지 못할 수 있어요. 먼저 앱 정보 화면의 오른쪽 위 메뉴에서 "제한된 설정 허용"을 켠 다음, 접근성 설정에서 SOME 화면 분석을 켜 주세요.</string>
     <string name="settings_accessibility_step_1">1. 앱 정보 열기</string>

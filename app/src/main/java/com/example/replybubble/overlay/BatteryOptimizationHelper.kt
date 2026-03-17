@@ -9,6 +9,9 @@ import android.os.PowerManager
 import android.provider.Settings
 
 object BatteryOptimizationHelper {
+    private const val ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL =
+        "android.settings.VIEW_ADVANCED_POWER_USAGE_DETAIL"
+
     fun isIgnoringBatteryOptimizations(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -20,15 +23,13 @@ object BatteryOptimizationHelper {
     }
 
     fun openBatteryOptimizationSettings(context: Context) {
-        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        if (context !is Activity) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val packageUri = Uri.parse("package:${context.packageName}")
+        val appBatteryIntent = Intent(ACTION_VIEW_ADVANCED_POWER_USAGE_DETAIL, packageUri)
+        if (tryStartActivity(context, appBatteryIntent)) {
+            return
         }
-        runCatching {
-            context.startActivity(intent)
-        }.onFailure {
-            openAppInfoSettings(context)
-        }
+
+        openAppInfoSettings(context)
     }
 
     fun openAppInfoSettings(context: Context) {
@@ -36,9 +37,16 @@ object BatteryOptimizationHelper {
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
             Uri.parse("package:${context.packageName}"),
         )
+        tryStartActivity(context, intent)
+    }
+
+    private fun tryStartActivity(context: Context, intent: Intent): Boolean {
         if (context !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        context.startActivity(intent)
+
+        return runCatching {
+            context.startActivity(intent)
+        }.isSuccess
     }
 }
